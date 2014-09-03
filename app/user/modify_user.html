@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ko" ng-app="modifyUser">
+<head>
+	<meta charset="UTF-8">
+
+	<title>메모 App</title>
+</head>
+<link href="./../../style/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+<style>
+    body {
+    	padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+    }
+
+    .fake-link {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+</style>
+<link href="./../../style/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+
+<!-- AngularJs는 별도의 태그와 속성 그리고 표현식을 제공한다.
+	ng-app 으로 AngularJs 기반 웹 어플리케이션임을 선언.
+
+
+	Model -> Js Objects
+	View -> DOM
+	Controller -> js Function
+-->
+
+<body ng-controller="ModifyUserController">
+
+	<div class="navbar navbar-inverse navbar-fixed-top">
+	    <div class="navbar-inner">
+	     	<div class="container">
+		        <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+		        	<span class="icon-bar"></span>
+		            <span class="icon-bar"></span>
+		            <span class="icon-bar"></span>
+		        </button>
+		        
+		        <a class="btn btn-navbar" type="button" ng-click="logOutUser()">Log Out</a>
+
+		        <a class="brand" href="./../main/index.html">M.E.M.O</a>
+		        <div class="nav-collapse collapse">
+		            <ul class="nav">
+		              	<li class="active"><a href="#about">Modify</a></li>
+		              	<li><a href="dd">Contact</a></li>
+		            </ul>
+		            <a class="btn nav-collapse collapse" type="button" ng-click="logOutUser()">Log Out</a>
+		        </div>
+
+	        </div>
+	    </div>
+	</div>
+
+	<div class="container">
+
+		<legend><h1>My Info</h1></legend>
+		<form method="POST" id="modifyForm" name="modifyForm" ng-submit="submitModifyForm(curPasswd, newPasswd, confirmPasswd)">
+			<table class="table">
+				<tr>
+					<th>email ID</th>
+					<td>{{sesseionUser.userEmail}}</td>
+				</tr>
+				<tr>
+					<th>Nick Name</th>
+					<td>{{sesseionUser.userNickName}}</td>
+				</tr>
+				<tr>
+					<th>Password</th>
+					<td>
+						<input type="Password" name="input_newPasswd" id="input_newPasswd" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])\w{6,}" ng-model="curPasswd">
+					</td>
+				</tr>
+				<tr>
+					<th>New Password</th>
+					<td>
+						<input type="Password" name="input_newPasswd" id="input_newPasswd" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])\w{6,}" ng-model="newPasswd">
+					</td>
+				</tr>
+				<tr>
+					<th>Confirm Password</th>
+					<td><input type="Password" name="input_ComfirmPasswd" id="input_ComfirmPasswd" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])\w{6,}" ng-model="confirmPasswd"></td>
+				</tr>
+			</table>
+
+			<button class="btn btn-primary">수정</button>
+		</form>
+
+		
+
+	</div>
+
+
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+	<script src="http://code.jquery.com/jquery.js"></script>
+	<script src="./../../style/bootstrap/js/bootstrap.min.js"></script>
+	<script src="./../common/json2.js"></script>
+	<script type="text/javascript" src="./../common/user_valid_interceptor.js"></script>
+	<script type="text/javascript" src="./../common/app_db_conn.js"></script>
+	<script type="text/javascript" src="./modify_user_controller.js"></script>
+	<script type="text/javascript" src="./modify_user_service.js"></script>
+	
+</body>
+</html>

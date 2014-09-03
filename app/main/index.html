@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ko" ng-app="main">
+<head>
+	<meta charset="UTF-8">
+
+	<title>메모 App</title>
+</head>
+<link href="./../../style/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+<style>
+    body {
+    	padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+    }
+
+    .fake-link {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+</style>
+<link href="./../../style/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+
+<!-- AngularJs는 별도의 태그와 속성 그리고 표현식을 제공한다.
+	ng-app 으로 AngularJs 기반 웹 어플리케이션임을 선언.
+
+
+	Model -> Js Objects
+	View -> DOM
+	Controller -> js Function
+-->
+
+<body ng-controller="MyMemoListController">
+
+	<div class="navbar navbar-inverse navbar-fixed-top">
+	    <div class="navbar-inner">
+	     	<div class="container">
+		        <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+		        	<span class="icon-bar"></span>
+		            <span class="icon-bar"></span>
+		            <span class="icon-bar"></span>
+		        </button>
+		        
+		        <a class="btn btn-navbar" type="button" ng-click="logOutUser()">Log Out</a>
+
+		        <a class="brand" href="#">M.E.M.O</a>
+		        <div class="nav-collapse collapse">
+		            <ul class="nav">
+		              	<li><a href="./../user/modify_user.html">Modify</a></li>
+		              	<li><a href="#contact">Contact</a></li>
+		            </ul>
+		            <a class="btn nav-collapse collapse" type="button" ng-click="logOutUser()">Log Out</a>
+		        </div>
+
+	        </div>
+	    </div>
+	</div>
+
+    <div class="container">
+
+      	<div><h1>{{sesseionUser.userNickName}}'s Memo App</h1><div>
+
+      	<div>
+      		{{time.now}}
+      	</div>
+
+      	<div id="newItemFormDiv">
+			<form id="newItemForm" name="newItemForm" class="form-inline" action="" ng-submit="addNewTodo(inputMemo)">
+				<div class="control-group">
+					<div class="controls">
+						<textarea id="input_memo" rows="10" cols="80" name="newItemText" ng-model="inputMemo" placeholder="여기에 새 메모를 입력하세요."></textarea>
+
+						<br/>
+						<span id="mainRestTextLength"></span>
+					</div>
+				</div>
+
+				<br/>
+
+				<div id="addButtonGrp" style="display: none;">
+					<input type="submit" value="저장하기" class="btn btn-primary input">
+					<a class="btn input" name="cancel">취소하기</a>
+				</div>
+			</form>
+		</div>
+
+		<!-- Search Form -->
+
+		<div ng-switch on="isSearchingFavoriteMemo">
+			<span ng-switch-when="false" class="fake-link" title="중요">
+				<i class="icon-star-empty" ng-click="findFavoriveMemo()"></i>
+			</span>
+			<span ng-switch-when="true" class="fake-link" title="중요">
+				<i class="icon-star" ng-click="findFavoriveMemo()"></i>
+			</span>
+		</div>
+
+		<div>
+			<form class="form-search">
+			  	<div class="input-append">
+			    	<input type="text" class="span2 search-query" ng-model="search_text.text" ng-change="changeSearchMode(search_text.text.length)" placeholder="메모 빠른 검색">
+			    	<a class="btn" href="#"><i class="icon-search"></i></a>
+			  	</div>
+			</form>
+		</div>
+
+
+		<div ng-switch on="isSearchingMemo">
+			<p ng-switch-when="true">
+				<strong>{{(userMemoList|filter:search_text).length}}개</strong>의 검색결과가 있습니다.
+				<button type="button" class="close" ng-click="setBackMemoList()">×</button>
+			</p>
+
+		</div>
+
+		<button ng-click="retrieveMemoList()">가져오기</button>
+
+		<i id="showMemoList" class="icon-arrow-up" ></i>
+		
+	
+		<!-- <code>&lt;section&gt;</code> -->
+
+		<br>
+		<br>
+
+		<div id="mainMemoList">
+
+			<div  ng-repeat="memo in userMemoList | orderBy:'inpt_dtm':true | filter:search_text" class="unstyled">
+				
+				<!-- Favorite Div -->
+				<div ng-switch on="memo.importance">
+
+					<span ng-switch-when="false" class="fake-link" title="중요한 메모는 클릭해주세요.">
+						<i class="icon-star-empty" ng-click="makeFavoriteMemo($index)"></i>
+					</span>
+					<span ng-switch-when="true" class="fake-link">
+						<i class="icon-star" ng-click="makeFavoriteMemo($index)"></i>
+					</span>
+
+				</div>
+
+
+				<div class="row">
+					<div class="span4">
+						<p>		
+							<!-- 조회 div -->
+							<div id="retrieveTodo_{{$index}}">
+
+								
+								<div class="well">{{memo.text}}</div>
+
+								<div>
+									<span class="fake-link" title="삭제">
+										<i class="icon-remove" ng-click="deleteMemoFromMemoList($index)"></i>
+									</span>
+									<span class="fake-link" title="수정">
+										<i class="icon-pencil" ng-click="toggleModifyMemoForm($index)"></i>
+									</span>
+									<small>{{memo.inpt_dtm | date:'yyyy.MM.dd HH:mm'}}</small>
+								</div>
+							</div>
+
+						</p>
+					</div>
+				</div>
+				
+				<!-- 수정폼 div -->
+				<div id="modifyToDo_{{$index}}" style="display: none;">
+					<form name="modifyItemForm" class="form-inline" action="">
+						
+						<div class="control-group">
+							<div class="controls">
+								<textarea id="user_memo_{{$index}}" rows="10" cols="80" name="userMeMo" ng-model="modi_memo" ng-init="modi_memo = memo.text"></textarea>
+							</div>
+						</div>
+
+						<br/>
+
+						<div id="modifyButtonGrp">
+							<button id="add" class="btn btn-primary input" ng-click="modifyMemoList($index, modi_memo)">저장하기</button>
+							<button class="btn input" name="cancel" ng-click="toggleModifyMemoForm($index)">취소하기</button>
+						</div>
+					</form>
+				</div>
+
+			</div>
+
+		</div>
+
+    </div>
+
+
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+	<script src="http://code.jquery.com/jquery.js"></script>
+	<script src="./../../style/bootstrap/js/bootstrap.min.js"></script>
+	<script src="./../common/json2.js"></script>
+	<script type="text/javascript" src="./../common/user_valid_interceptor.js"></script>
+	<script type="text/javascript" src="./../common/app_db_conn.js"></script>
+	<script type="text/javascript" src="./../util/current_time_util.js"></script>
+	<script type="text/javascript" src="./app_main_controller.js"></script>
+	<script type="text/javascript" src="./app_main_service.js"></script>
+	<script type="text/javascript" src="./app_main.js"></script>
+</body>
+</html>
